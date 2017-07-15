@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>canvas</title>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script>
+        document.documentElement.style.fontSize = document.documentElement.clientWidth / 10 + 'px';
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+        }
+        button {
+            outline: none;
+            background: transparent;
+            width: 1rem;
+            height: 1rem;
+            border: none;
+        }
+
+        .btns {
+            display: flex;
+            justify-content: space-between;
+            position: fixed;
+            width: 100%;
+            height: 1rem;
+            top: 0;
+            left:0;
+        }
+
+        .btns button img:first-child {
+            width: 100%;
+            height: 100%;
+            display: inline-block;
+        }
+
+        .btns button.active img:first-child {
+            display: none;
+        }
+
+        .btns button img:last-child {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .btns button.active img:last-child {
+            display: inline-block;
+        }
+
+        canvas {
+            background: lightblue;
+        }
+    </style>
+</head>
+<body>
+<div class="btns">
+    <button>
+        <img src="icon/ico-penciltool-bjVVM.svg" alt="">
+        <img src="icon/ico-penciltool-bjVVM-2.svg" alt="">
+    </button>
+    <button>
+        <img src="icon/ico-erasertool-1Ma4y-2.svg" alt="">
+        <img src="icon/ico-erasertool-1Ma4y.svg" alt="">
+    </button>
+    <button>
+        <img src="icon/ico-magicerasertool-.svg" alt="">
+        <img src="icon/ico-magicerasertool--2.svg" alt="">
+    </button>
+    <button>
+        <img src="icon/ico-presetclipboard-.svg" alt="">
+        <img src="icon/ico-presetclipboard--2.svg" alt="">
+    </button>
+</div>
+<canvas id="app"></canvas>
+<script>
+    var canvas = $('#app')[0];
+    canvas.width = document.documentElement.clientWidth
+    canvas.height = document.documentElement.clientHeight
+    console.log(canvas.width);
+    console.log(canvas.height);
+    var context = canvas.getContext('2d')
+    var previousPoint
+
+    $('.btns').on('click', 'button', function (e) {
+        var index = $(e.currentTarget).index()
+        $('.btns button').removeClass('active')
+        $($('.btns button')[index]).addClass('active')
+        if(index===2){
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }else if( index===3) {
+            var img = canvas.toDataURL("image/png");
+            var newWindow = window.open('about:blank', 'image from canvas');
+            newWindow.document.write("<img src='" + img + "' alt='from canvas'/>");
+        }
+    })
+
+    canvas.addEventListener('touchmove', function (e) {
+        e.preventDefault()
+        var pageX = e.touches[0].pageX
+        var pageY = e.touches[0].pageY
+        if ($($('.btns button')[0]).hasClass('active')) {
+            if (previousPoint) {
+                context.strokeStyle = 'black'
+                context.beginPath()
+                context.moveTo(previousPoint.pageX, previousPoint.pageY)
+                context.lineTo(pageX, pageY)
+                context.stroke()
+            }
+            previousPoint = {
+                pageX: pageX,
+                pageY: pageY
+            }
+        } else if ($($('.btns button')[1]).hasClass('active')) {
+            context.clearRect(pageX - 5, pageY - 5, 10, 10)
+        }
+    })
+    canvas.addEventListener('touchend', function () {
+        previousPoint = null
+    })
+</script>
+</body>
+</html>
